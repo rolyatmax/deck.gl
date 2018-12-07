@@ -149,10 +149,12 @@ export default class LayerAttribute extends Attribute {
     if (update) {
       // Custom updater - typically for non-instanced layers
       update.call(context, this, {data, props, numInstances});
-      this.update({
-        value: this.value,
-        constant: this.constant
-      });
+      if (this.gl) {
+        this.update({
+          value: this.value,
+          constant: this.constant
+        });
+      }
       this._checkAttributeArray();
     } else if (accessor) {
       // Standard updater
@@ -206,7 +208,7 @@ export default class LayerAttribute extends Attribute {
           this.update({constant: false, buffer});
           state.needsRedraw = true;
         }
-      } else {
+      } else if (ArrayBuffer.isView(buffer)) {
         const ArrayType = glArrayFromType(this.type || GL.FLOAT);
         if (!(buffer instanceof ArrayType)) {
           throw new Error(`Attribute ${this.id} must be of type ${ArrayType.name}`);
@@ -218,6 +220,9 @@ export default class LayerAttribute extends Attribute {
           this.update({constant: false, value: buffer});
           state.needsRedraw = true;
         }
+      } else {
+        this.update(buffer);
+        state.needsRedraw = true;
       }
       return true;
     }
@@ -276,7 +281,9 @@ export default class LayerAttribute extends Attribute {
       this._normalizeValue(objectValue, value, i);
       i += size;
     }
-    this.update({value});
+    if (this.gl) {
+      this.update({value});
+    }
   }
 
   // Validate deck.gl level fields

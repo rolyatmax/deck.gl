@@ -69,7 +69,7 @@ export default class SolidPolygonLayer extends Layer {
     const {gl} = this.context;
     this.setState({
       numInstances: 0,
-      IndexType: hasFeature(gl, FEATURES.ELEMENT_INDEX_UINT32) ? Uint32Array : Uint16Array
+      IndexType: !gl || hasFeature(gl, FEATURES.ELEMENT_INDEX_UINT32) ? Uint32Array : Uint16Array
     });
 
     const attributeManager = this.getAttributeManager();
@@ -79,7 +79,13 @@ export default class SolidPolygonLayer extends Layer {
 
     /* eslint-disable max-len */
     attributeManager.add({
-      indices: {size: 1, isIndexed: true, update: this.calculateIndices, noAlloc},
+      indices: {
+        size: 1,
+        isIndexed: true,
+        type: GL.UNSIGNED_INT,
+        update: this.calculateIndices,
+        noAlloc
+      },
       positions: {
         size: 3,
         transition: ATTRIBUTE_TRANSITION,
@@ -219,7 +225,9 @@ export default class SolidPolygonLayer extends Layer {
   updateAttributes(props) {
     super.updateAttributes(props);
     const attributes = this.getAttributeManager().getChangedAttributes({clearChangedFlags: true});
-    const {topModel, sideModel, vertexCount, numInstances} = this.state;
+    const {topModel, sideModel} = this.state;
+    const vertexCount = this.props.vertexCount || this.state.vertexCount;
+    const numInstances = this.props.numInstances || this.state.numInstances;
 
     if (topModel) {
       topModel.setVertexCount(vertexCount);
@@ -259,6 +267,9 @@ export default class SolidPolygonLayer extends Layer {
   }
 
   _getModels(gl) {
+    if (!gl) {
+      return null;
+    }
     const {id, filled, extruded} = this.props;
 
     let topModel;

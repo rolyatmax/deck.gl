@@ -27,7 +27,7 @@ export default class AttributeTransitionManager {
 
     if (Transform.isSupported(gl)) {
       this.isSupported = true;
-    } else {
+    } else if (gl) {
       log.warn('WebGL2 not supported by this browser. Transition animation is disabled.')();
     }
   }

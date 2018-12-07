@@ -120,7 +120,7 @@ export default class PathLayer extends Layer {
       if (this.state.model) {
         this.state.model.delete();
       }
-      this.setState({model: this._getModel(gl)});
+      this.setState({model: gl && this._getModel(gl)});
       attributeManager.invalidateAll();
     }
 
