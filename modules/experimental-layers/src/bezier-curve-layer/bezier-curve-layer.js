@@ -27,6 +27,7 @@ import vs from './bezier-curve-layer-vertex.glsl';
 import fs from './bezier-curve-layer-fragment.glsl';
 
 const NUM_SEGMENTS = 40;
+const DEFAULT_COLOR = [0, 0, 0, 255];
 
 const defaultProps = {
   strokeWidth: {type: 'number', min: 0, value: 1},
@@ -34,7 +35,7 @@ const defaultProps = {
   getSourcePosition: {type: 'accessor', value: x => x.sourcePosition},
   getTargetPosition: {type: 'accessor', value: x => x.targetPosition},
   getControlPoint: {type: 'accessor', value: x => x.controlPoint},
-  getColor: {type: 'accessor', value: x => x.color || [0, 0, 0, 255]}
+  getColor: {type: 'accessor', value: DEFAULT_COLOR}
 };
 
 export default class BezierCurveLayer extends Layer {
@@ -70,7 +71,7 @@ export default class BezierCurveLayer extends Layer {
         type: GL.UNSIGNED_BYTE,
         transition: true,
         accessor: 'getColor',
-        update: this.calculateInstanceColors
+        defaultValue: [0, 0, 0, 255]
       }
     });
     /* eslint-enable max-len */
